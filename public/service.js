@@ -12,8 +12,8 @@
 // ============================================================================
 
 const CONFIG = {
-    // HuggingFace model paths - using CDN-friendly URL
-    MODEL_BASE_URL: 'https://huggingface.co/Supertone/supertonic-2/resolve/main',
+    // Use local proxy to bypass CORS (Worker proxies to HuggingFace)
+    MODEL_BASE_URL: '/hf',
     ONNX_PATH: 'onnx',
     VOICE_STYLES_PATH: 'voice_styles',
     

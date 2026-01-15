@@ -1,7 +1,8 @@
 {
   "name": "supertonic-v2",
+  "main": "worker.js",
   "compatibility_date": "2026-01-15",
   "assets": {
-    "directory": "./"
+    "directory": "./public"
   }
 }
