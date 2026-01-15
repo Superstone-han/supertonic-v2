@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supertonic 2 - TTS Service</title>
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
+    <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp">
+    
+    <!-- Import map for ES modules -->
+    <script type="importmap">
+        {
+            "imports": {
+                "onnxruntime-web": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0/dist/ort.all.min.mjs"
+            }
+        }
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            color: #888;
+            margin-bottom: 30px;
+        }
+        
+        .status-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .status-text {
+            font-size: 1.1rem;
+        }
+        
+        .status-text.loading {
+            color: #ffd700;
+        }
+        
+        .status-text.ready {
+            color: #00ff88;
+        }
+        
+        .status-text.error {
+            color: #ff4444;
+        }
+        
+        .voices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .voice-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .voice-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #3a7bd5;
+        }
+        
+        .voice-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .voice-langs {
+            font-size: 0.85rem;
+            color: #888;
+        }
+        
+        .info {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .info a {
+            color: #3a7bd5;
+            text-decoration: none;
+        }
+        
+        .info a:hover {
+            text-decoration: underline;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Supertonic 2</h1>
+        <p class="subtitle">Lightning Fast, On-Device, Multilingual TTS</p>
+        
+        <div class="status-box">
+            <p id="statusText" class="status-text loading">Initializing...</p>
+        </div>
+        
+        <div id="voicesContainer" class="hidden">
+            <h3>Available Voices</h3>
+            <div id="voicesGrid" class="voices-grid"></div>
+        </div>
+        
+        <div class="info">
+            <p>Powered by <a href="https://huggingface.co/Supertone/supertonic-2" target="_blank">Supertone Supertonic 2</a></p>
+            <p>For use with <a href="https://github.com/nicedude11199/read-aloud" target="_blank">Read Aloud</a> extension</p>
+        </div>
+    </div>
+    
+    <script type="module" src="service.js"></script>
+</body>
+</html>
