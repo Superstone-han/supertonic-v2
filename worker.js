@@ -2,7 +2,7 @@
  * Cloudflare Worker for Supertonic 2 TTS Service
  * 
  * Handles:
- * 1. Static file serving (index.html, service.js)
+ * 1. Static file serving with iframe-friendly headers
  * 2. Proxy requests to HuggingFace to bypass CORS
  */
 
@@ -17,10 +17,33 @@ export default {
             return handleHFProxy(request, url);
         }
         
-        // For all other requests, let the assets handle it
-        return env.ASSETS.fetch(request);
+        // For static files, add iframe-friendly headers
+        const response = await env.ASSETS.fetch(request);
+        return addIframeHeaders(response);
     }
 };
+
+/**
+ * Add headers to allow iframe embedding
+ */
+function addIframeHeaders(response) {
+    const newHeaders = new Headers(response.headers);
+    
+    // Remove headers that block iframe embedding
+    newHeaders.delete('X-Frame-Options');
+    newHeaders.delete('Content-Security-Policy');
+    
+    // Allow embedding from any origin
+    newHeaders.set('Access-Control-Allow-Origin', '*');
+    newHeaders.set('Cross-Origin-Embedder-Policy', 'unsafe-none');
+    newHeaders.set('Cross-Origin-Opener-Policy', 'unsafe-none');
+    
+    return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: newHeaders,
+    });
+}
 
 async function handleHFProxy(request, url) {
     // Remove /hf/ prefix and construct HuggingFace URL
@@ -41,6 +64,7 @@ async function handleHFProxy(request, url) {
         newHeaders.set('Access-Control-Allow-Origin', '*');
         newHeaders.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
         newHeaders.set('Access-Control-Allow-Headers', '*');
+        newHeaders.delete('X-Frame-Options');
         
         // Handle preflight requests
         if (request.method === 'OPTIONS') {
