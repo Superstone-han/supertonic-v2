@@ -5,14 +5,14 @@
  * Communication is done via postMessage with the parent window (Read Aloud's player.js).
  */
 
-import * as ort from 'onnxruntime-web';
+// ONNX Runtime is loaded via CDN in index.html, available as global 'ort'
 
 // ============================================================================
 // Configuration
 // ============================================================================
 
 const CONFIG = {
-    // HuggingFace model paths
+    // HuggingFace model paths - using CDN-friendly URL
     MODEL_BASE_URL: 'https://huggingface.co/Supertone/supertonic-2/resolve/main',
     ONNX_PATH: 'onnx',
     VOICE_STYLES_PATH: 'voice_styles',
@@ -233,7 +233,7 @@ class UnicodeProcessor {
         text = text.replace(/\s+/g, ' ').trim();
 
         // Add period if needed
-        if (!/[.!?;:,'"')\]}…。」』】〉》›»]$/.test(text)) {
+        if (!/[.!?;:,'"')\]}>…。」』】〉》›»]$/.test(text)) {
             text += '.';
         }
 
@@ -285,6 +285,9 @@ class TextToSpeech {
 
         const url = `${CONFIG.MODEL_BASE_URL}/${CONFIG.VOICE_STYLES_PATH}/${voiceId}.json`;
         const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to load voice style: ${response.status}`);
+        }
         const voiceStyle = await response.json();
 
         // Create tensors
@@ -568,6 +571,17 @@ async function initializeTTS() {
     try {
         updateStatus('Loading ONNX Runtime...', 'loading');
         
+        // Wait for ort to be available (loaded via CDN)
+        let attempts = 0;
+        while (typeof ort === 'undefined' && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+        
+        if (typeof ort === 'undefined') {
+            throw new Error('ONNX Runtime failed to load');
+        }
+        
         // Configure ONNX Runtime
         ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0/dist/';
         ort.env.wasm.numThreads = 1;
@@ -580,11 +594,17 @@ async function initializeTTS() {
         // Load config
         updateStatus('Loading configuration...', 'loading');
         const cfgsResponse = await fetch(`${CONFIG.MODEL_BASE_URL}/${CONFIG.ONNX_PATH}/tts.json`);
+        if (!cfgsResponse.ok) {
+            throw new Error(`Failed to load config: ${cfgsResponse.status}`);
+        }
         const cfgs = await cfgsResponse.json();
 
         // Load text processor
         updateStatus('Loading text processor...', 'loading');
         const indexerResponse = await fetch(`${CONFIG.MODEL_BASE_URL}/${CONFIG.ONNX_PATH}/unicode_indexer.json`);
+        if (!indexerResponse.ok) {
+            throw new Error(`Failed to load indexer: ${indexerResponse.status}`);
+        }
         const indexer = await indexerResponse.json();
         const textProcessor = new UnicodeProcessor(indexer);
 

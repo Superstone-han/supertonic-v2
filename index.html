@@ -4,17 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supertonic 2 - TTS Service</title>
-    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
-    <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp">
-    
-    <!-- Import map for ES modules -->
-    <script type="importmap">
-        {
-            "imports": {
-                "onnxruntime-web": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0/dist/ort.all.min.mjs"
-            }
-        }
-    </script>
     
     <style>
         * {
@@ -147,6 +136,10 @@
         </div>
     </div>
     
-    <script type="module" src="service.js"></script>
+    <!-- Load ONNX Runtime from CDN (UMD build for global 'ort') -->
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0/dist/ort.min.js"></script>
+    
+    <!-- Load service script -->
+    <script src="service.js"></script>
 </body>
 </html>
